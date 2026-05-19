@@ -22,5 +22,5 @@ from app_run import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/company_details/', views.My)
+    path('api/company_details/', views.company_details)
 ]
