@@ -114,3 +114,8 @@ STATIC_ROOT = 'static'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# My variables
+COMPANY_NAME = 'Run Boy Run'
+SLOGAN = 'Running is a victory!'
+CONTACTS = 't.me/Ngel0, 5, авеню Анатоль Франс, Париж'
