@@ -1,9 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from .models import Run
-from .serializers import RunSerializer
+from .serializers import RunSerializer, UserSerializer
+
+User = get_user_model()
 
 @api_view(['GET'])
 def company_details(request):
@@ -16,3 +19,16 @@ def company_details(request):
 class RunViewSet(ModelViewSet):
     queryset = Run.objects.all()
     serializer_class = RunSerializer
+
+class UserViewSet(ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        qs = self.queryset.filter(is_superuser=False) #сразу исключаем админов
+        type = self.request.query_params.get('type', None)
+        if type == 'coach':
+            return qs.filter(is_staff=True)
+        if type == 'athlete':
+            return qs.filter(is_staff=False)
+        return qs
