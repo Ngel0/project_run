@@ -4,11 +4,6 @@ from .models import Run
 
 User = get_user_model()
 
-class RunSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Run
-        fields = '__all__'
-
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
 
@@ -22,3 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
         if obj.is_staff:
             return 'coach'
         return 'athlete'
+
+class RunSerializer(serializers.ModelSerializer):
+    athlete_data = UserSerializer(source='athlete', read_only=True)
+
+    class Meta:
+        model = Run
+        fields = '__all__'
