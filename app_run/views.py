@@ -1,9 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from .models import Run
 from .serializers import RunSerializer, UserSerializer
 
@@ -38,3 +41,23 @@ class UserViewSet(ReadOnlyModelViewSet):
         if type == 'athlete':
             return qs.filter(is_staff=False)
         return qs
+
+class StartRunView(APIView):
+    def patch(self, request, id):
+        run = get_object_or_404(Run, id=id)
+        if run.status != 'init':
+            return Response({'message':'Can not start the run'}, status=status.HTTP_400_BAD_REQUEST)
+        run.status = 'in_progress'
+        run.save()
+        data = {"message": run.status}
+        return Response(data, status=status.HTTP_200_OK)
+
+class StopRunView(APIView):
+    def patch(self, request, id):
+        run = get_object_or_404(Run, id=id)
+        if run.status != 'in_progress':
+            return Response({'message':'Can not stop the run'}, status=status.HTTP_400_BAD_REQUEST)
+        run.status = 'finished'
+        run.save()
+        data = {"message": run.status}
+        return Response(data, status=status.HTTP_200_OK)
