@@ -49,8 +49,7 @@ class StartRunView(APIView):
             return Response({'message':'Can not start the run'}, status=status.HTTP_400_BAD_REQUEST)
         run.status = 'in_progress'
         run.save()
-        data = {"message": run.status}
-        return Response(data, status=status.HTTP_200_OK)
+        return Response({'message':run.status}, status=status.HTTP_200_OK)
 
 class StopRunView(APIView):
     def post(self, request, id):
@@ -59,5 +58,4 @@ class StopRunView(APIView):
             return Response({'message':'Can not stop the run'}, status=status.HTTP_400_BAD_REQUEST)
         run.status = 'finished'
         run.save()
-        data = {"message": run.status}
-        return Response(data, status=status.HTTP_200_OK)
+        return Response({'message':run.status}, status=status.HTTP_200_OK)
