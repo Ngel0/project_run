@@ -43,7 +43,7 @@ class UserViewSet(ReadOnlyModelViewSet):
         return qs
 
 class StartRunView(APIView):
-    def patch(self, request, id):
+    def pos(self, request, id):
         run = get_object_or_404(Run, id=id)
         if run.status != 'init':
             return Response({'message':'Can not start the run'}, status=status.HTTP_400_BAD_REQUEST)
@@ -53,7 +53,7 @@ class StartRunView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 class StopRunView(APIView):
-    def patch(self, request, id):
+    def post(self, request, id):
         run = get_object_or_404(Run, id=id)
         if run.status != 'in_progress':
             return Response({'message':'Can not stop the run'}, status=status.HTTP_400_BAD_REQUEST)
