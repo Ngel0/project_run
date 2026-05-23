@@ -43,7 +43,7 @@ class UserViewSet(ReadOnlyModelViewSet):
         return qs
 
 class StartRunView(APIView):
-    def pos(self, request, id):
+    def post(self, request, id):
         run = get_object_or_404(Run, id=id)
         if run.status != 'init':
             return Response({'message':'Can not start the run'}, status=status.HTTP_400_BAD_REQUEST)
