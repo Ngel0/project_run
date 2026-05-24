@@ -11,9 +11,10 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(BaseUserSerializer):
     type = serializers.SerializerMethodField()
+    runs_finished = serializers.SerializerMethodField()
 
     class Meta(BaseUserSerializer.Meta):
-        fields = ['id', 'date_joined', 'username', 'last_name', 'first_name', 'type']
+        fields = ['id', 'date_joined', 'username', 'last_name', 'first_name', 'type', 'runs_finished']
 
     def get_type(self, obj):
         if obj.is_superuser:
@@ -21,6 +22,9 @@ class UserSerializer(BaseUserSerializer):
         if obj.is_staff:
             return 'coach'
         return 'athlete'
+    
+    def get_runs_finished(self, obj):
+        return len(obj.run_set.filter(status='finished'))
 
 class RunSerializer(serializers.ModelSerializer):
     athlete_data = BaseUserSerializer(source='athlete', read_only=True)
