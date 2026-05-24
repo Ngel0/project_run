@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -23,6 +24,8 @@ def company_details(request):
 class RunViewSet(ModelViewSet):
     queryset = Run.objects.all()
     serializer_class = RunSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['athlete', 'status']
 
     def get_queryset(self):
         return Run.objects.select_related('athlete').all()
