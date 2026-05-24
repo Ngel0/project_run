@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from .models import Run
 from .serializers import RunSerializer, UserSerializer
+from .paginations import RunPagination, UserPagination
 
 User = get_user_model()
 
@@ -27,6 +28,7 @@ class RunViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['athlete', 'status']
     ordering_fields = ['created_at']
+    pagination_class = RunPagination
 
     def get_queryset(self):
         return Run.objects.select_related('athlete').all()
@@ -37,6 +39,7 @@ class UserViewSet(ReadOnlyModelViewSet):
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['last_name', 'first_name']
     ordering_fields = ['date_joined']
+    pagination_class = UserPagination
 
     def get_queryset(self):
         qs = self.queryset.filter(is_superuser=False) #сразу исключаем админов
