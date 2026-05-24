@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.views import APIView
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -24,8 +24,9 @@ def company_details(request):
 class RunViewSet(ModelViewSet):
     queryset = Run.objects.all()
     serializer_class = RunSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['athlete', 'status']
+    ordering_fields = ['created_at']
 
     def get_queryset(self):
         return Run.objects.select_related('athlete').all()
@@ -33,8 +34,9 @@ class RunViewSet(ModelViewSet):
 class UserViewSet(ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['last_name', 'first_name']
+    ordering_fields = ['date_joined']
 
     def get_queryset(self):
         qs = self.queryset.filter(is_superuser=False) #сразу исключаем админов
