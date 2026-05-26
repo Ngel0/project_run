@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .models import Run
+from .models import Run, AthleteInfo
 from .serializers import RunSerializer, UserSerializer
 from .paginations import RunPagination, UserPagination
 
@@ -67,3 +67,30 @@ class StopRunView(APIView):
         run.status = 'finished'
         run.save()
         return Response({'message':run.status}, status=status.HTTP_200_OK)
+
+class AthleteInfoView(APIView):
+    def get(self, request, user_id):
+        athlete = get_object_or_404(User, id=user_id)
+        athlete_info, created = AthleteInfo.objects.get_or_create(user=athlete)
+        data = {
+            'goals': athlete_info.goals,
+            'weight': athlete_info.weight,
+            'user_id': user_id,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+    def put(self, request, user_id):
+        athlete = get_object_or_404(User, id=user_id)
+        weight = request.data.get('weight')
+        if weight is not None and (weight <= 0 or weight >= 900):
+            return Response({'message': 'Invalid weight value'}, status=status.HTTP_400_BAD_REQUEST)
+        athlete_info, created = AthleteInfo.objects.update_or_create(user=athlete, defaults={
+            'goals': request.data.get('goals'),
+            'weight': weight
+        })
+        data = {
+            'goals': athlete_info.goals,
+            'weight': athlete_info.weight,
+            'user_id': user_id,
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
