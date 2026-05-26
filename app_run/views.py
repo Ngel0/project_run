@@ -82,7 +82,7 @@ class AthleteInfoView(APIView):
     def put(self, request, user_id):
         athlete = get_object_or_404(User, id=user_id)
         weight = request.data.get('weight')
-        if weight is not None and (weight <= 0 or weight >= 900):
+        if weight is not None and (int(weight) <= 0 or int(weight) >= 900):
             return Response({'message': 'Invalid weight value'}, status=status.HTTP_400_BAD_REQUEST)
         athlete_info, created = AthleteInfo.objects.update_or_create(user=athlete, defaults={
             'goals': request.data.get('goals'),
