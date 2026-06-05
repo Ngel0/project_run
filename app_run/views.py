@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .models import Run, AthleteInfo
+from .models import Run, AthleteInfo, Challenge
 from .serializers import RunSerializer, UserSerializer
 from .paginations import RunPagination, UserPagination
 
@@ -99,3 +99,20 @@ class AthleteInfoView(APIView):
             'user_id': user_id,
         }
         return Response(data, status=status.HTTP_201_CREATED)
+
+class ChallengesView(APIView):
+    def get(self, request):
+        athlete_id = request.GET.get('athlete')
+        if athlete_id is None:
+            queryset = Challenge.objects.all()
+        else:
+            try:
+                athlete_id = int(athlete_id)
+            except(ValueError):
+                return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
+            queryset = list(Challenge.objects.filter(athlete=athlete_id))
+        data = []
+        for challenge in queryset:
+            item = {'full_name': challenge.full_name, 'athlete': challenge.athlete.id}
+            data.append(item)
+        return Response(data, status=status.HTTP_200_OK)
