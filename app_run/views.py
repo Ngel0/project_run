@@ -66,6 +66,8 @@ class StopRunView(APIView):
             return Response({'message':'Can not stop the run'}, status=status.HTTP_400_BAD_REQUEST)
         run.status = 'finished'
         run.save()
+        if Run.objects.filter(athlete=run.athlete, status='finished').count() >= 10:
+            Challenge.objects.create(full_name='Сделай 10 Забегов!', athlete=run.athlete)
         return Response({'message':run.status}, status=status.HTTP_200_OK)
 
 class AthleteInfoView(APIView):
