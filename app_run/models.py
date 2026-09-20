@@ -23,5 +23,5 @@ class Challenge(models.Model):
 
 class Position(models.Model):
     run = models.IntegerField()
-    latitude = models.FloatField()
-    longtitude = models.FloatField()
+    latitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
+    longtitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
