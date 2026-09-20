@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Run
+from .models import Run, Position
 
 User = get_user_model()
 
@@ -32,3 +32,22 @@ class RunSerializer(serializers.ModelSerializer):
     class Meta:
         model = Run
         fields = '__all__'
+
+class PositionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Position
+        fields = '__all__'
+
+    def validate(self, data):
+        run = Run.objects.filter(id=data.get('run')).first()
+        latitude = data.get('latitude')
+        longtitude = data.get('longtitude')
+        if run is None:
+            raise serializers.ValidationError({'run':'run does not exist'})
+        if run.status != 'in_progress':
+            raise serializers.ValidationError({'run':'the run is not in progress'})
+        if latitude is None or latitude < -90.0 or latitude > 90.0:
+            return serializers.ValidationError({'latitude':'invalid number'})
+        if longtitude is None or longtitude < -180.0 or longtitude > 180.0:
+            return serializers.ValidationError({'longtitude':'invalid number'})
+        return data

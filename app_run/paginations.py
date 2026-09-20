@@ -5,3 +5,6 @@ class RunPagination(PageNumberPagination):
 
 class UserPagination(PageNumberPagination):
     page_size_query_param = 'size'
+
+class PositionPagination(PageNumberPagination):
+    page_size_query_param = 'size'

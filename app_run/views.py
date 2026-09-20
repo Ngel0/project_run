@@ -8,9 +8,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from .models import Run, AthleteInfo, Challenge
-from .serializers import RunSerializer, UserSerializer
-from .paginations import RunPagination, UserPagination
+from .models import Run, AthleteInfo, Challenge, Position
+from .serializers import RunSerializer, UserSerializer, PositionSerializer
+from .paginations import RunPagination, UserPagination, PositionPagination
 
 User = get_user_model()
 
@@ -118,3 +118,10 @@ class ChallengesView(APIView):
             item = {'full_name': challenge.full_name, 'athlete': challenge.athlete.id}
             data.append(item)
         return Response(data, status=status.HTTP_200_OK)
+
+class PositionViewSet(ModelViewSet):
+    queryset = Position.objects.all()
+    serializer_class = PositionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['run']
+    pagination_class = PositionPagination
