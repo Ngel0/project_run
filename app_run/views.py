@@ -125,11 +125,3 @@ class PositionViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['run']
     pagination_class = PositionPagination
-
-    #get по run id
-    # def get_queryset(self):
-    #     qs = self.queryset.all()
-    #     run = self.request.query_params.get('run', None)
-    #     if run:
-    #         qs = qs.filter(run=run)
-    #     return qs

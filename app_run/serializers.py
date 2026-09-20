@@ -47,7 +47,7 @@ class PositionSerializer(serializers.ModelSerializer):
         if run.status != 'in_progress':
             raise serializers.ValidationError({'run':'the run is not in progress'})
         if latitude is None or latitude < -90.0 or latitude > 90.0:
-            return serializers.ValidationError({'latitude':'invalid number'})
+            raise serializers.ValidationError({'latitude':'invalid number'})
         if longtitude is None or longtitude < -180.0 or longtitude > 180.0:
-            return serializers.ValidationError({'longtitude':'invalid number'})
+            raise serializers.ValidationError({'longtitude':'invalid number'})
         return data
