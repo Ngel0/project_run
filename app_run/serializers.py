@@ -41,13 +41,13 @@ class PositionSerializer(serializers.ModelSerializer):
     def validate(self, data):
         run = Run.objects.filter(id=data.get('run')).first()
         latitude = data.get('latitude')
-        longtitude = data.get('longtitude')
+        longitude = data.get('longitude')
         if run is None:
             raise serializers.ValidationError({'run':'run does not exist'})
         if run.status != 'in_progress':
             raise serializers.ValidationError({'run':'the run is not in progress'})
         if latitude is None or latitude < -90.0 or latitude > 90.0:
             raise serializers.ValidationError({'latitude':'invalid number'})
-        if longtitude is None or longtitude < -180.0 or longtitude > 180.0:
-            raise serializers.ValidationError({'longtitude':'invalid number'})
+        if longitude is None or longitude < -180.0 or longitude > 180.0:
+            raise serializers.ValidationError({'longitude':'invalid number'})
         return data
