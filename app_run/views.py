@@ -84,7 +84,7 @@ class StopRunView(APIView):
 
         # challenge 50 km
         if Run.objects.filter(athlete=run.athlete).aggregate(Sum('distance'))['distance__sum'] >= 50:
-            Challenge.objects.create(full_name='Пробеги в общей сумме 50 километров!', athlete=run.athlete)
+            Challenge.objects.create(full_name='Пробеги 50 километров!', athlete=run.athlete)
         
         run.save()
         return Response({'message':run.status}, status=status.HTTP_200_OK)
