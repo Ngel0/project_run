@@ -68,10 +68,6 @@ class StopRunView(APIView):
             return Response({'message':'Can not stop the run'}, status=status.HTTP_400_BAD_REQUEST)
         run.status = 'finished'
 
-        # challenge 10 runs finished
-        if Run.objects.filter(athlete=run.athlete, status='finished').count() >= 10:
-            Challenge.objects.create(full_name='Сделай 10 Забегов!', athlete=run.athlete)
-
         # calculating run distance
         coordinates = list(Position.objects.filter(run=id).order_by('id').values_list('latitude', 'longitude'))
         total_distance = 0.0
@@ -81,12 +77,16 @@ class StopRunView(APIView):
                 for i in range(len(coordinates) - 1)
             )
         run.distance = total_distance
+        run.save()
+
+        # challenge 10 runs finished
+        if Run.objects.filter(athlete=run.athlete, status='finished').count() >= 10:
+            Challenge.objects.create(full_name='Сделай 10 Забегов!', athlete=run.athlete)
 
         # challenge 50 km
         if Run.objects.filter(athlete=run.athlete).aggregate(Sum('distance'))['distance__sum'] >= 50:
             Challenge.objects.create(full_name='Пробеги 50 километров!', athlete=run.athlete)
         
-        run.save()
         return Response({'message':run.status}, status=status.HTTP_200_OK)
 
 class AthleteInfoView(APIView):
