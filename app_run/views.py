@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from geopy.distance import geodesic
 from .models import Run, AthleteInfo, Challenge, Position
 from .serializers import RunSerializer, UserSerializer, PositionSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
@@ -65,9 +66,21 @@ class StopRunView(APIView):
         if run.status != 'in_progress':
             return Response({'message':'Can not stop the run'}, status=status.HTTP_400_BAD_REQUEST)
         run.status = 'finished'
-        run.save()
+
+        # checking challenge completion
         if Run.objects.filter(athlete=run.athlete, status='finished').count() >= 10:
             Challenge.objects.create(full_name='Сделай 10 Забегов!', athlete=run.athlete)
+
+        # calculating run distance
+        coordinates = list(Position.objects.filter(run=id).order_by('id').values_list('latitude', 'longitude'))
+        total_distance = 0.0
+        if len(coordinates) >= 2:
+            total_distance = sum(
+                geodesic(coordinates[i], coordinates[i + 1]).kilometers
+                for i in range(len(coordinates) - 1)
+            )
+        run.distance = total_distance
+        run.save()
         return Response({'message':run.status}, status=status.HTTP_200_OK)
 
 class AthleteInfoView(APIView):
