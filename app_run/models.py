@@ -26,3 +26,11 @@ class Position(models.Model):
     run = models.IntegerField()
     latitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     longitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
+
+class CollectibleItem(models.Model):
+    name = models.CharField(max_length=200)
+    uid = models.CharField(max_length=50, unique=True)
+    latitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
+    picture = models.URLField(null=True, blank=True)
+    value = models.IntegerField(null=True, blank=True)
