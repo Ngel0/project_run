@@ -154,7 +154,7 @@ class CollectibleItemView(APIView):
 
 class CollectibleFromFileView(APIView):
     def post(self, request):
-        uploaded_file = request.FILES.get('my_file')
+        uploaded_file = request.FILES.get('file')
         if not uploaded_file:
             return Response({'message': 'No Excel file was uploaded'}, status=status.HTTP_400_BAD_REQUEST)
         workbook = load_workbook(uploaded_file)
