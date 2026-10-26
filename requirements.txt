@@ -5,9 +5,11 @@ Django==5.2
 django-filter==25.1
 django-storages==1.14.6
 djangorestframework==3.16.0
+et_xmlfile==2.0.0
 geographiclib==2.1
 geopy==2.5.0
 jmespath==1.1.0
+openpyxl==3.1.5
 psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
 s3transfer==0.11.5
