@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Run, Position
+from .models import Run, Position, CollectibleItem
 
 User = get_user_model()
 
@@ -46,6 +46,20 @@ class PositionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'run':'run does not exist'})
         if run.status != 'in_progress':
             raise serializers.ValidationError({'run':'the run is not in progress'})
+        if latitude is None or latitude < -90.0 or latitude > 90.0:
+            raise serializers.ValidationError({'latitude':'invalid number'})
+        if longitude is None or longitude < -180.0 or longitude > 180.0:
+            raise serializers.ValidationError({'longitude':'invalid number'})
+        return data
+
+class CollectibleItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CollectibleItem
+        fields = '__all__'
+
+    def validate(self, data):
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
         if latitude is None or latitude < -90.0 or latitude > 90.0:
             raise serializers.ValidationError({'latitude':'invalid number'})
         if longitude is None or longitude < -180.0 or longitude > 180.0:

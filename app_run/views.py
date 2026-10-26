@@ -10,8 +10,8 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from geopy.distance import geodesic
-from .models import Run, AthleteInfo, Challenge, Position
-from .serializers import RunSerializer, UserSerializer, PositionSerializer
+from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
+from .serializers import RunSerializer, UserSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
 
 User = get_user_model()
@@ -144,3 +144,9 @@ class PositionViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['run']
     pagination_class = PositionPagination
+
+class CollectibleItemView(APIView):
+    def get(self, request):
+        items = CollectibleItem.objects.all()
+        serializer = CollectibleItemSerializer(items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
