@@ -174,4 +174,4 @@ class CollectibleFromFileView(APIView):
                 serializer.save()
             else:
                 invalid_rows.append(list(row))
-        return Response(invalid_rows, status=status.HTTP_201_CREATED)
+        return Response(invalid_rows, status=status.HTTP_200_OK)
