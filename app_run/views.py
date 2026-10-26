@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from geopy.distance import geodesic
+from openpyxl import load_workbook
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
 from .serializers import RunSerializer, UserSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
@@ -150,3 +151,27 @@ class CollectibleItemView(APIView):
         items = CollectibleItem.objects.all()
         serializer = CollectibleItemSerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CollectibleFromFileView(APIView):
+    def post(self, request):
+        uploaded_file = request.FILES.get('my_file')
+        if not uploaded_file:
+            return Response({'message': 'No Excel file was uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+        workbook = load_workbook(uploaded_file)
+        worksheet = workbook.active
+        invalid_rows = []
+        for row in worksheet.iter_rows(min_row=2, values_only=True):
+            name, uid, value, latitude, longitude, url = row
+            serializer = CollectibleItemSerializer(data={
+                'name': name,
+                'uid': uid,
+                'latitude': latitude,
+                'longitude': longitude,
+                'picture': url,
+                'value': value
+            })
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                invalid_rows.append(list(row))
+        return Response(invalid_rows, status=status.HTTP_201_CREATED)
