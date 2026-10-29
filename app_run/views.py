@@ -12,7 +12,7 @@ from django.db.models import Sum
 from geopy.distance import geodesic
 from openpyxl import load_workbook
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
-from .serializers import RunSerializer, UserSerializer, PositionSerializer, CollectibleItemSerializer
+from .serializers import RunSerializer, UserSerializer, UserDetailSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
 
 User = get_user_model()
@@ -52,6 +52,11 @@ class UserViewSet(ReadOnlyModelViewSet):
         if type == 'athlete':
             return qs.filter(is_staff=False)
         return qs
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return UserDetailSerializer
+        return super().get_serializer_class()
 
 class StartRunView(APIView):
     def post(self, request, id):

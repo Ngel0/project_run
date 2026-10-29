@@ -26,6 +26,15 @@ class UserSerializer(BaseUserSerializer):
     def get_runs_finished(self, obj):
         return len(obj.run_set.filter(status='finished'))
 
+class UserDetailSerializer(UserSerializer):
+    items = serializers.SerializerMethodField()
+    
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ['items']
+
+    def get_items(self, obj):
+        return CollectibleItemSerializer(obj.items.all(), many=True).data
+
 class RunSerializer(serializers.ModelSerializer):
     athlete_data = BaseUserSerializer(source='athlete', read_only=True)
 
