@@ -55,7 +55,7 @@ class PositionSerializer(serializers.ModelSerializer):
 class CollectibleItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CollectibleItem
-        fields = '__all__'
+        fields = ['name', 'uid', 'latitude', 'longitude', 'picture', 'value']
 
     def validate(self, data):
         latitude = data.get('latitude')
