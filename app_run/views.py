@@ -80,6 +80,16 @@ class StopRunView(APIView):
         run.distance = total_distance
         run.save()
 
+        # checking distance to collectible items
+        for position in coordinates:
+            for item in CollectibleItem.objects.all():
+                if item.users.filter(id=run.athlete.id).exists():
+                    continue  # skip if the user already has this item
+                if item.latitude is not None and item.longitude is not None:
+                    distance_to_item = geodesic(position, (item.latitude, item.longitude)).meters
+                    if distance_to_item <= 100:  # within 100 meters
+                        item.users.add(run.athlete)
+
         # challenge 10 runs finished
         if Run.objects.filter(athlete=run.athlete, status='finished').count() >= 10:
             Challenge.objects.create(full_name='Сделай 10 Забегов!', athlete=run.athlete)
