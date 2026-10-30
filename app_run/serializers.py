@@ -43,6 +43,8 @@ class RunSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PositionSerializer(serializers.ModelSerializer):
+    date_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S.%f')
+
     class Meta:
         model = Position
         fields = '__all__'
