@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum
+from django.db.models import Sum, Min, Max
 from geopy.distance import geodesic
 from openpyxl import load_workbook
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
@@ -94,6 +94,15 @@ class StopRunView(APIView):
                     distance_to_item = geodesic(position, (item.latitude, item.longitude)).meters
                     if distance_to_item <= 100:  # within 100 meters
                         item.users.add(run.athlete)
+
+        # calculating run time
+        aggrs = Position.objects.filter(run=id).aggregate(max_time=Max('date_time'), min_time=Min('date_time'))
+        max_time = aggrs['max_time']
+        min_time = aggrs['min_time']
+        if max_time and min_time:
+            timedelta = max_time - min_time
+            run.run_time_seconds = int(timedelta.total_seconds())
+            run.save()
 
         # challenge 10 runs finished
         if Run.objects.filter(athlete=run.athlete, status='finished').count() >= 10:
