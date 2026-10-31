@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum, Min, Max
+from django.db.models import Count, Sum, Min, Max, Q
 from geopy.distance import geodesic
 from openpyxl import load_workbook
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
@@ -51,6 +51,8 @@ class UserViewSet(ReadOnlyModelViewSet):
             return qs.filter(is_staff=True)
         if type == 'athlete':
             return qs.filter(is_staff=False)
+        # добавляем аннотацию для подсчета завершенных забегов
+        qs = qs.annotate(runs_finished=Count('runs', filter=Q(runs__status='finished')))
         return qs
 
     def get_serializer_class(self):

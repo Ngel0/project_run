@@ -24,7 +24,10 @@ class UserSerializer(BaseUserSerializer):
         return 'athlete'
     
     def get_runs_finished(self, obj):
-        return len(obj.run_set.filter(status='finished'))
+        try:
+            return obj.runs_finished
+        except AttributeError:
+            return 0
 
 class UserDetailSerializer(UserSerializer):
     items = serializers.SerializerMethodField()
