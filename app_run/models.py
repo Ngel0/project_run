@@ -3,7 +3,7 @@ from django.conf import settings
 
 class Run(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='runs')
     comment = models.TextField()
     STATUS_CHOICES = [
         ('init', 'Забег инициализирован'),
@@ -21,7 +21,7 @@ class AthleteInfo(models.Model):
 
 class Challenge(models.Model):
     full_name = models.CharField(max_length=50)
-    athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='challenges')
 
 class Position(models.Model):
     run = models.IntegerField()
