@@ -176,6 +176,35 @@ class PositionViewSet(ModelViewSet):
     filterset_fields = ['run']
     pagination_class = PositionPagination
 
+    def perform_create(self, serializer):
+        run_id = serializer.validated_data.get('run')
+        previous_position = Position.objects.filter(run=run_id).order_by('-id').first()
+        if previous_position:
+            previous_latitude = previous_position.latitude
+            previous_longitude = previous_position.longitude
+            current_latitude = serializer.validated_data.get('latitude')
+            current_longitude = serializer.validated_data.get('longitude')
+            if previous_latitude and previous_longitude and current_latitude and current_longitude:
+                distance = geodesic((previous_latitude, previous_longitude), (current_latitude, current_longitude)).kilometers
+            else:
+                distance = previous_position.distance
+
+            previous_time = previous_position.date_time
+            current_time = serializer.validated_data.get('date_time')
+            if previous_time and current_time:
+                time_delta = (current_time - previous_time).total_seconds()
+                if previous_position.distance:
+                    distance_delta = distance - previous_position.distance
+                else:
+                    distance_delta = distance
+                speed = distance_delta * 1000 / time_delta  # speed in m/s
+            else:
+                speed = previous_position.speed
+        else:
+            distance = 0.0
+            speed = 0.0
+        serializer.save(distance=distance, speed=speed)
+
 class CollectibleItemView(APIView):
     def get(self, request):
         items = CollectibleItem.objects.all()
