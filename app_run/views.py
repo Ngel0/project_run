@@ -45,10 +45,13 @@ class UserViewSet(ReadOnlyModelViewSet):
     pagination_class = UserPagination
 
     def get_queryset(self):
+        # сразу исключаем админов
+        qs = self.queryset.filter(is_superuser=False)
+
         # добавляем аннотацию для подсчета завершенных забегов
         qs = qs.annotate(runs_finished=Count('runs', filter=Q(runs__status='finished')))
-        
-        qs = self.queryset.filter(is_superuser=False) #сразу исключаем админов
+
+        # фильтруем по типу пользователя, если указан параметр запроса
         type = self.request.query_params.get('type', None)
         if type == 'coach':
             return qs.filter(is_staff=True)
