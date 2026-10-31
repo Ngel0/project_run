@@ -11,8 +11,9 @@ class Run(models.Model):
         ('finished', 'Забег закончен')
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='init')
-    distance = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
+    distance = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     run_time_seconds = models.IntegerField(null=True, blank=True)
+    speed = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
 
 class AthleteInfo(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -28,6 +29,8 @@ class Position(models.Model):
     latitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     longitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     date_time = models.DateTimeField(null=True, blank=True)
+    distance = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    speed = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
 
 class CollectibleItem(models.Model):
     name = models.CharField(max_length=200)
