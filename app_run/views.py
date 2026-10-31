@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db.models import Count, Sum, Min, Max, Q
+from django.db.models import Count, Sum, Min, Max, Avg, Q
 from geopy.distance import geodesic
 from openpyxl import load_workbook
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
@@ -89,6 +89,10 @@ class StopRunView(APIView):
                 for i in range(len(coordinates) - 1)
             )
         run.distance = total_distance
+        run.save()
+
+        # calculating run speed
+        run.speed = Position.objects.filter(run=id).aggregate(Avg('speed'))['speed__avg']
         run.save()
 
         # checking distance to collectible items
