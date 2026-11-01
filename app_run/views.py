@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Count, Sum, Min, Max, Avg, Q
 from geopy.distance import geodesic
 from openpyxl import load_workbook
+from decimal import Decimal
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
 from .serializers import RunSerializer, UserSerializer, UserDetailSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
@@ -193,7 +194,7 @@ class PositionViewSet(ModelViewSet):
             else:
                 distance_delta = 0.0
             if previous_position.distance:
-                distance = previous_position.distance + distance_delta
+                distance = previous_position.distance + Decimal(str(distance_delta))
             else:
                 distance = distance_delta
 
