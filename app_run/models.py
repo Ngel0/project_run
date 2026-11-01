@@ -42,8 +42,8 @@ class CollectibleItem(models.Model):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='items', blank=True)
 
 class Subscribe(models.Model):
-    coach = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribers')
-    athlete = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribtions')
+    coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribers')
+    athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribtions')
 
     class Meta:
         constraints = [
