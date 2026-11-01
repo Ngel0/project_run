@@ -13,7 +13,7 @@ from geopy.distance import geodesic
 from openpyxl import load_workbook
 from decimal import Decimal
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem, Subscribe
-from .serializers import RunSerializer, UserSerializer, UserDetailSerializer, PositionSerializer, CollectibleItemSerializer
+from .serializers import RunSerializer, UserSerializer, UserAthleteDetailSerializer, UserCoachDetailSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
 
 User = get_user_model()
@@ -62,7 +62,10 @@ class UserViewSet(ReadOnlyModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
-            return UserDetailSerializer
+            user = self.get_object()
+            if user.is_staff:
+                return UserCoachDetailSerializer
+            return UserAthleteDetailSerializer
         return super().get_serializer_class()
 
 class StartRunView(APIView):

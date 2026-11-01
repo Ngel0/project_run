@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Run, Position, CollectibleItem
+from .models import Run, Position, CollectibleItem, Subscribe
 
 User = get_user_model()
 
@@ -29,14 +29,31 @@ class UserSerializer(BaseUserSerializer):
         except AttributeError:
             return 0
 
-class UserDetailSerializer(UserSerializer):
+class UserAthleteDetailSerializer(UserSerializer):
     items = serializers.SerializerMethodField()
+    coach = serializers.SerializerMethodField()
     
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['items']
+        fields = UserSerializer.Meta.fields + ['items', 'coach']
 
     def get_items(self, obj):
         return CollectibleItemSerializer(obj.items.all(), many=True).data
+
+    def get_coach(self, obj):
+        return obj.subscribtions.values_list('coach_id', flat=True).first()
+
+class UserCoachDetailSerializer(UserSerializer):
+    items = serializers.SerializerMethodField()
+    athletes = serializers.SerializerMethodField()
+    
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ['items', 'athletes']
+
+    def get_items(self, obj):
+        return CollectibleItemSerializer(obj.items.all(), many=True).data
+
+    def get_athletes(self, obj):
+        return obj.subscribers.values_list('athlete_id', flat=True)
 
 class RunSerializer(serializers.ModelSerializer):
     athlete_data = BaseUserSerializer(source='athlete', read_only=True)
