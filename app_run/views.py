@@ -122,6 +122,10 @@ class StopRunView(APIView):
         # challenge 50 km
         if Run.objects.filter(athlete=run.athlete).aggregate(Sum('distance'))['distance__sum'] >= 50:
             Challenge.objects.create(full_name='Пробеги 50 километров!', athlete=run.athlete)
+
+        # calculating 2 km in less than 10 minutes challenge
+        if run.distance >= 2 and run.run_time_seconds <= 600:
+            Challenge.objects.create(full_name='2 километра за 10 минут!', athlete=run.athlete)
         
         return Response({'message':run.status}, status=status.HTTP_200_OK)
 
