@@ -189,18 +189,18 @@ class PositionViewSet(ModelViewSet):
             current_latitude = serializer.validated_data.get('latitude')
             current_longitude = serializer.validated_data.get('longitude')
             if previous_latitude and previous_longitude and current_latitude and current_longitude:
-                distance = geodesic((previous_latitude, previous_longitude), (current_latitude, current_longitude)).kilometers
+                distance_delta = geodesic((previous_latitude, previous_longitude), (current_latitude, current_longitude)).kilometers
             else:
-                distance = previous_position.distance
+                distance_delta = 0.0
+            if previous_position.distance:
+                distance = previous_position.distance + distance_delta
+            else:
+                distance = distance_delta
 
             previous_time = previous_position.date_time
             current_time = serializer.validated_data.get('date_time')
             if previous_time and current_time:
                 time_delta = (current_time - previous_time).total_seconds()
-                if previous_position.distance:
-                    distance_delta = distance - previous_position.distance
-                else:
-                    distance_delta = distance
                 speed = distance_delta * 1000 / time_delta  # speed in m/s
             else:
                 speed = previous_position.speed
