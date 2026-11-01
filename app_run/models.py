@@ -40,3 +40,15 @@ class CollectibleItem(models.Model):
     picture = models.URLField(null=True, blank=True)
     value = models.IntegerField(null=True, blank=True)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='items', blank=True)
+
+class Subscribe(models.Model):
+    coach = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribers')
+    athlete = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribtions')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['coach', 'athlete'],
+                name='unique_coach_athlete'
+            )
+        ]
