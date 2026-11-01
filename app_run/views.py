@@ -12,7 +12,7 @@ from django.db.models import Count, Sum, Min, Max, Avg, Q
 from geopy.distance import geodesic
 from openpyxl import load_workbook
 from decimal import Decimal
-from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem
+from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem, Subscribe
 from .serializers import RunSerializer, UserSerializer, UserDetailSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
 
@@ -243,3 +243,21 @@ class CollectibleFromFileView(APIView):
             else:
                 invalid_rows.append(list(row))
         return Response(invalid_rows, status=status.HTTP_200_OK)
+
+class SubscribeView(APIView):
+    def post(self, request, id):
+        try:
+            coach = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
+        if not coach.is_staff:
+            return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            athlete = User.objects.get(id=request.data.get('athlete'))
+        except User.DoesNotExist, ValueError:
+            return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Subscribe.objects.filter(coach=coach, athlete=athlete).exists():
+            return Response({'message': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
+        Subscribe.objects.create(coach=coach, athlete=athlete)
+        return Response({'message': 'Successfully subscribed'}, status=status.HTTP_200_OK)
