@@ -266,3 +266,21 @@ class SubscribeView(APIView):
             return Response({'message': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
         Subscribe.objects.create(coach=coach, athlete=athlete)
         return Response({'message': 'Successfully subscribed'}, status=status.HTTP_200_OK)
+
+class ChallengesSummaryView(APIView):
+    def get(self, request):
+        data = []
+        for challenge in Challenge.objects.all():
+            athletes = []
+            all_athlete_objects = User.objects.filter(challenges=challenge)
+            for athlete in all_athlete_objects:
+                athletes.append({
+                    'id': athlete.id,
+                    'full_name': f'{athlete.first_name} {athlete.last_name}',
+                    'username': athlete.username
+                })
+            data.append({
+                'name_to_display': challenge.full_name,
+                'athletes': athletes
+            })
+        return Response(data, status=status.HTTP_200_OK)

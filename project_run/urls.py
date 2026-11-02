@@ -36,5 +36,6 @@ urlpatterns = [
     path('api/challenges/', views.ChallengesView.as_view()),
     path('api/collectible_item/', views.CollectibleItemView.as_view()),
     path('api/upload_file/', views.CollectibleFromFileView.as_view()),
-    path('api/subscribe_to_coach/<int:id>/', views.SubscribeView.as_view())
+    path('api/subscribe_to_coach/<int:id>/', views.SubscribeView.as_view()),
+    path('api/challenges_summary/', views.ChallengesSummaryView.as_view())
 ]
