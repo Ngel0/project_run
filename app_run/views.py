@@ -259,6 +259,8 @@ class SubscribeView(APIView):
             athlete = User.objects.get(id=request.data.get('athlete'))
         except (User.DoesNotExist, ValueError):
             return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
+        if athlete.is_staff:
+            return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
 
         if Subscribe.objects.filter(coach=coach, athlete=athlete).exists():
             return Response({'message': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
