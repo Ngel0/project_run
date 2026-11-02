@@ -251,13 +251,13 @@ class SubscribeView(APIView):
     def post(self, request, id):
         try:
             coach = User.objects.get(id=id)
-        except User.DoesNotExist:
+        except (User.DoesNotExist):
             return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
         if not coach.is_staff:
             return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
         try:
             athlete = User.objects.get(id=request.data.get('athlete'))
-        except User.DoesNotExist, ValueError:
+        except (User.DoesNotExist, ValueError):
             return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
 
         if Subscribe.objects.filter(coach=coach, athlete=athlete).exists():
