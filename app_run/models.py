@@ -24,6 +24,14 @@ class Challenge(models.Model):
     full_name = models.CharField(max_length=50)
     athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='challenges')
 
+    class Meta:
+            constraints = [
+                models.UniqueConstraint(
+                    fields=['full_name', 'athlete'],
+                    name='unique_challenge_per_athlete',
+                )
+            ]
+
 class Position(models.Model):
     run = models.IntegerField()
     latitude = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
