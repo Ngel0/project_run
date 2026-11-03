@@ -12,6 +12,7 @@ from django.db.models import Count, Sum, Min, Max, Avg, Q
 from geopy.distance import geodesic
 from openpyxl import load_workbook
 from decimal import Decimal
+from collections import defaultdict
 from .models import Run, AthleteInfo, Challenge, Position, CollectibleItem, Subscribe
 from .serializers import RunSerializer, UserSerializer, UserAthleteDetailSerializer, UserCoachDetailSerializer, PositionSerializer, CollectibleItemSerializer
 from .paginations import RunPagination, UserPagination, PositionPagination
@@ -269,18 +270,31 @@ class SubscribeView(APIView):
 
 class ChallengesSummaryView(APIView):
     def get(self, request):
+        # data = []
+        # for challenge in Challenge.objects.values_list('full_name', flat=True).distinct():
+        #     athletes = []
+        #     all_athlete_objects = User.objects.filter(challenges__full_name=challenge)
+        #     for athlete in all_athlete_objects:
+        #         athletes.append({
+        #             'id': athlete.id,
+        #             'full_name': f'{athlete.first_name} {athlete.last_name}',
+        #             'username': athlete.username
+        #         })
+        #     data.append({
+        #         'name_to_display': challenge,
+        #         'athletes': athletes
+        #     })
+        challenges_dict = defaultdict(list)
+        for challenge in Challenge.objects.prefetch_related('athlete'):
+            challenges_dict[challenge.full_name].append({
+                'id': challenge.athlete_id,
+                'full_name': f'{challenge.athlete.first_name} {challenge.athlete.last_name}',
+                'username': challenge.athlete.username
+            })
         data = []
-        for challenge in Challenge.objects.values_list('full_name', flat=True).distinct():
-            athletes = []
-            all_athlete_objects = User.objects.filter(challenges__full_name=challenge)
-            for athlete in all_athlete_objects:
-                athletes.append({
-                    'id': athlete.id,
-                    'full_name': f'{athlete.first_name} {athlete.last_name}',
-                    'username': athlete.username
-                })
+        for key in challenges_dict.keys():
             data.append({
-                'name_to_display': challenge,
-                'athletes': athletes
+                'name_to_display': key,
+                'athletes': challenges_dict[key]
             })
         return Response(data, status=status.HTTP_200_OK)
