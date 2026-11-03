@@ -270,20 +270,6 @@ class SubscribeView(APIView):
 
 class ChallengesSummaryView(APIView):
     def get(self, request):
-        # data = []
-        # for challenge in Challenge.objects.values_list('full_name', flat=True).distinct():
-        #     athletes = []
-        #     all_athlete_objects = User.objects.filter(challenges__full_name=challenge)
-        #     for athlete in all_athlete_objects:
-        #         athletes.append({
-        #             'id': athlete.id,
-        #             'full_name': f'{athlete.first_name} {athlete.last_name}',
-        #             'username': athlete.username
-        #         })
-        #     data.append({
-        #         'name_to_display': challenge,
-        #         'athletes': athletes
-        #     })
         challenges_dict = defaultdict(list)
         for challenge in Challenge.objects.prefetch_related('athlete'):
             challenges_dict[challenge.full_name].append({
