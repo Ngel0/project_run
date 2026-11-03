@@ -270,9 +270,9 @@ class SubscribeView(APIView):
 class ChallengesSummaryView(APIView):
     def get(self, request):
         data = []
-        for challenge in Challenge.objects.all():
+        for challenge in Challenge.objects.values_list('full_name', flat=True).distinct():
             athletes = []
-            all_athlete_objects = User.objects.filter(challenges=challenge)
+            all_athlete_objects = User.objects.filter(challenges__full_name=challenge)
             for athlete in all_athlete_objects:
                 athletes.append({
                     'id': athlete.id,
@@ -280,7 +280,7 @@ class ChallengesSummaryView(APIView):
                     'username': athlete.username
                 })
             data.append({
-                'name_to_display': challenge.full_name,
+                'name_to_display': challenge,
                 'athletes': athletes
             })
         return Response(data, status=status.HTTP_200_OK)
