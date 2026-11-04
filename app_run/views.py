@@ -271,7 +271,7 @@ class SubscribeView(APIView):
 class ChallengesSummaryView(APIView):
     def get(self, request):
         challenges_dict = defaultdict(list)
-        for challenge in Challenge.objects.prefetch_related('athlete'):
+        for challenge in Challenge.objects.select_related('athlete'):
             challenges_dict[challenge.full_name].append({
                 'id': challenge.athlete_id,
                 'full_name': f'{challenge.athlete.first_name} {challenge.athlete.last_name}',
