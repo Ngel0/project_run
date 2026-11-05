@@ -307,15 +307,14 @@ class RateView(APIView):
         
         rating = request.data.get('rating', None)
         if not rating:
-            subscribe.rating = None
-            subscribe.save()
-            return Response({'message': 'Rating removed'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Rating value is required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             rating = int(rating)
         except (ValueError):
             return Response({'message': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
         if rating < 1 or rating > 5:
             return Response({'message': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
+        
         subscribe.rating = rating
         subscribe.save()
         return Response({'message': 'Successfully assigned rating'}, status=status.HTTP_200_OK)
