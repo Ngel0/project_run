@@ -300,8 +300,9 @@ class RateView(APIView):
         if athlete.is_staff:
             return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
 
-        subscribe = Subscribe.objects.get(coach=coach, athlete=athlete)
-        if not subscribe:
+        try:
+            subscribe = Subscribe.objects.get(coach=coach, athlete=athlete)
+        except (Subscribe.DoesNotExist):
             return Response({'message': 'Athlete is not subscribed to this coach'}, status=status.HTTP_400_BAD_REQUEST)
         
         rating = request.data.get('rating', None)
