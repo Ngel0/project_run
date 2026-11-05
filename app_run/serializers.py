@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models.aggregates import Avg
 from django.contrib.auth import get_user_model
 from .models import Run, Position, CollectibleItem, Subscribe
 
@@ -12,9 +13,10 @@ class BaseUserSerializer(serializers.ModelSerializer):
 class UserSerializer(BaseUserSerializer):
     type = serializers.SerializerMethodField()
     runs_finished = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
 
     class Meta(BaseUserSerializer.Meta):
-        fields = ['id', 'date_joined', 'username', 'last_name', 'first_name', 'type', 'runs_finished']
+        fields = ['id', 'date_joined', 'username', 'last_name', 'first_name', 'type', 'runs_finished', 'rating']
 
     def get_type(self, obj):
         if obj.is_superuser:
@@ -28,6 +30,9 @@ class UserSerializer(BaseUserSerializer):
             return obj.runs_finished
         except AttributeError:
             return 0
+
+    def get_rating(self, obj):
+        return obj.subscribers.aggregate(Avg('rating'))['rating__avg'] or None
 
 class UserAthleteDetailSerializer(UserSerializer):
     items = serializers.SerializerMethodField()

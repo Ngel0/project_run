@@ -284,3 +284,37 @@ class ChallengesSummaryView(APIView):
                 'athletes': challenges_dict[key]
             })
         return Response(data, status=status.HTTP_200_OK)
+
+class RateView(APIView):
+    def post(self, request, coach_id):
+        try:
+            coach = User.objects.get(id=coach_id)
+        except (User.DoesNotExist):
+            return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
+        if not coach.is_staff:
+            return Response({'message': 'Invalid coach id'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            athlete = User.objects.get(id=request.data.get('athlete'))
+        except (User.DoesNotExist, ValueError):
+            return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
+        if athlete.is_staff:
+            return Response({'message': 'Invalid athlete id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        subscribe = Subscribe.objects.get(coach=coach, athlete=athlete)
+        if not subscribe:
+            return Response({'message': 'Athlete is not subscribed to this coach'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        rating = request.data.get('rating', None)
+        if not rating:
+            subscribe.rating = None
+            subscribe.save()
+            return Response({'message': 'Rating removed'}, status=status.HTTP_200_OK)
+        try:
+            rating = int(rating)
+        except (ValueError):
+            return Response({'message': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
+        if rating < 1 or rating > 5:
+            return Response({'message': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
+        subscribe.rating = rating
+        subscribe.save()
+        return Response({'message': 'Successfully assigned rating'}, status=status.HTTP_200_OK)

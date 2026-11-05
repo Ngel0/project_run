@@ -52,6 +52,8 @@ class CollectibleItem(models.Model):
 class Subscribe(models.Model):
     coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribers')
     athlete = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscribtions')
+    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
+    rating = models.IntegerField(choices=RATING_CHOICES, null=True, blank=True)
 
     class Meta:
         constraints = [
