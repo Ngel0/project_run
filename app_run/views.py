@@ -50,8 +50,11 @@ class UserViewSet(ReadOnlyModelViewSet):
         # сразу исключаем админов
         qs = self.queryset.filter(is_superuser=False)
 
-        # добавляем аннотацию для подсчета завершенных забегов
-        qs = qs.annotate(runs_finished=Count('runs', filter=Q(runs__status='finished')))
+        # аннотируем рейтинг и количество завершенных забегов
+        qs = qs.annotate(
+            rating=Avg('subscribers__rating'),
+            runs_finished=Count('runs', filter=Q(runs__status='finished'), distinct=True),
+        )
 
         # фильтруем по типу пользователя, если указан параметр запроса
         type = self.request.query_params.get('type', None)
