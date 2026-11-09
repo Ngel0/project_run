@@ -321,3 +321,47 @@ class RateView(APIView):
         subscribe.rating = rating
         subscribe.save()
         return Response({'message': 'Successfully assigned rating'}, status=status.HTTP_200_OK)
+
+class AnalyticsView(APIView):
+    def get(self, request, coach_id):
+        try:
+            coach = User.objects.get(id=coach_id)
+        except (User.DoesNotExist):
+            return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
+        if not coach.is_staff:
+            return Response({'message': 'Invalid coach id'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        coach_runs = Run.objects.filter(athlete__subscribtions__coach=coach, status='finished')
+        longest_run = (
+            coach_runs
+            .exclude(distance__isnull=True)
+            .order_by('-distance', 'athlete_id')
+            .values('athlete_id', 'distance')
+            .first()
+        )
+        total_run = (
+            coach_runs
+            .exclude(distance__isnull=True)
+            .values('athlete_id')
+            .annotate(total_distance=Sum('distance'))
+            .order_by('-total_distance', 'athlete_id')
+            .first()
+        )
+        speed_avg = (
+            coach_runs
+            .exclude(speed__isnull=True)
+            .values('athlete_id')
+            .annotate(average_speed=Avg('speed'))
+            .order_by('-average_speed', 'athlete_id')
+            .first()
+        )
+        
+        data = {
+            'longest_run_user': longest_run['athlete_id'] if longest_run else None,
+            'longest_run_value': longest_run['distance'] if longest_run else None,
+            'total_run_user': total_run['athlete_id'] if total_run else None,
+            'total_run_value': total_run['total_distance'] if total_run else None,
+            'speed_avg_user': speed_avg['athlete_id'] if speed_avg else None,
+            'speed_avg_value': speed_avg['average_speed'] if speed_avg else None,
+        }
+        return Response(data, status=status.HTTP_200_OK)
